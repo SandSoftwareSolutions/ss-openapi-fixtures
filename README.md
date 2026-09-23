@@ -14,6 +14,45 @@ npm install @sandsoftwaresolutions/openapi-fixtures
 
 Works in Node.js 18+ and any runtime supported by `@faker-js/faker`.
 
+## Use it in Jest
+
+The loader is asynchronous, so load the specification once in a Jest setup or test and reuse the fixture factory:
+
+```js
+import { createOpenApiFixturesFrom } from "@sandsoftwaresolutions/openapi-fixtures";
+import path from "node:path";
+
+let fixtures;
+
+beforeAll(async () => {
+  fixtures = await createOpenApiFixturesFrom(path.resolve("fixtures/openapi.yaml"), { seed: 123 });
+});
+
+test("renders a user returned by the documented API", () => {
+  expect(fixtures.byOperation("getUser")).toEqual(expect.objectContaining({ email: expect.any(String) }));
+});
+```
+
+The package does not depend on Jest. The same async factory works with Vitest, Node's test runner, or any other framework that supports promises.
+
+## External `$ref`s and YAML
+
+The synchronous `createOpenApiFixtures(document)` API accepts an object that is already in memory. Use `loadOpenApiDocument(input)` or `createOpenApiFixturesFrom(input)` when the specification is a JSON/YAML file, a URL, or contains references to other files:
+
+```js
+const fixtures = await createOpenApiFixturesFrom("./openapi.yaml", { seed: 42 });
+const user = fixtures.byOperation("getUser");
+```
+
+The loader uses `@apidevtools/swagger-parser` to parse and bundle local or remote references before fixture generation. Bundling keeps references manageable and avoids turning circular schemas into an unserializable fully dereferenced object. External URLs are fetched by the parser, so only load specifications from sources you trust.
+
+The low-level APIs remain synchronous and dependency-light when you already have a parsed document:
+
+```js
+const document = { openapi: "3.0.0", info: { title: "Demo", version: "1.0.0" }, paths: {} };
+const fixtures = createOpenApiFixtures(document, { seed: 42 });
+```
+
 ## Quick start
 
 Given a specification containing an operation called `getUser`:

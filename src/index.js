@@ -1,4 +1,5 @@
 import { faker } from "@faker-js/faker";
+import SwaggerParser from "@apidevtools/swagger-parser";
 
 function resolve(schema, document) {
   if (!schema?.$ref) return schema ?? {};
@@ -57,4 +58,20 @@ export function createOpenApiFixtures(document, options = {}) {
     },
     fromSchema(schema, fixtureOptions = {}) { return createFixture(schema, { document, ...options, ...fixtureOptions }); }
   };
+}
+
+/**
+ * Bundle local and remote $ref values into a document that the synchronous
+ * fixture API can consume. The returned document keeps references where
+ * possible, avoiding the circular object graphs produced by full dereferencing.
+ */
+export async function loadOpenApiDocument(input) {
+  if (!input || typeof input !== "string" && typeof input !== "object") throw new TypeError("input must be a document, file path, or URL");
+  return SwaggerParser.bundle(input);
+}
+
+/** Load an OpenAPI/Swagger input, then create fixtures from its operations. */
+export async function createOpenApiFixturesFrom(input, options = {}) {
+  const document = await loadOpenApiDocument(input);
+  return createOpenApiFixtures(document, options);
 }

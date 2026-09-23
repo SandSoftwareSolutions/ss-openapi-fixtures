@@ -1,6 +1,6 @@
 {
   "name": "@sandsoftwaresolutions/openapi-fixtures",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generate realistic, reproducible API fixtures from OpenAPI and Swagger schemas.",
   "type": "module",
   "exports": { ".": { "types": "./src/index.d.ts", "import": "./src/index.js" } },
@@ -12,5 +12,8 @@
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/SandSoftwareSolutions/ss-openapi-fixtures.git" },
   "publishConfig": { "access": "public" },
-  "dependencies": { "@faker-js/faker": "^10.6.0" }
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^10.1.1",
+    "@faker-js/faker": "^10.6.0"
+  }
 }
